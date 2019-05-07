@@ -37,25 +37,27 @@ M3 cppM3(loc l) {
 	return createM3FromCppFile(l, stdLib = localCP, includeDirs = arduinoCP);
 }
 
-// Transitive declarations
+// Transitive list of all variable declarations and functions/methods
+// declared in any of the files part of the include graph
 set[loc] allVarDecls(M3 m) = { l | <l, _> <- m.declarations, isVariable(l) };
 set[loc] allFunctions(M3 m)  = { l | <l, _> <- m.declarations, isMethod(l) || isFunction(l) };
 
-// Local declarations
+// List of all variable declarations and functions/methods of the analyzed file only
 set[loc] varDecls(M3 m) = { l | l <- allVarDecls(m), isLocal(m, l) };
 set[loc] functions(M3 m)  = { l | l <- allFunctions(m),  isLocal(m, l) };
 
-// Typed declarations
+// List of variable declarations and functions/methods with their declared types
 rel[loc, TypeSymbol] typedVarDecls(M3 m) = { <l, t> | l <- varDecls(m), t <- m.declaredType[l] };
 rel[loc, TypeSymbol] typedFunctions(M3 m)  = { <l, t> | l <- functions(m),  t <- m.declaredType[l] };
 
-// Memory calculations
+// Basic memory usage calculation; to be done
 int sketchSize(M3 m) = (0 | it + byteSize(t) | <l, t> <- typedVarDecls(m));
 
-// All transitive #includes, as parsed by CDT and
-// their corresponding filepath, if applicable
+// List of all the includes of the include graph. Includes are mapped to
+// the physical locations of the corresponding C++ files, when resolved.
 rel[loc, loc] includes(M3 m) = { <i, l> | i <- domain(m.includeDirectives), l <- m.includeResolution[i] };
 
+// Ratio of comments/documentation.
 // Ratio is character-wise, not line-wise
 real commentRatio(M3 m) {
 	int fileSize = size(readFile(m.id));
