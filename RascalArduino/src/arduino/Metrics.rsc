@@ -49,6 +49,9 @@ set[loc] functions(M3 m)  = { l | l <- allFunctions(m),  isLocal(m, l) };
 rel[loc, TypeSymbol] typedVarDecls(M3 m) = { <l, t> | l <- varDecls(m), t <- m.declaredType[l] };
 rel[loc, TypeSymbol] typedFunctions(M3 m)  = { <l, t> | l <- functions(m),  t <- m.declaredType[l] };
 
+// Memory calculations
+int sketchSize(M3 m) = (0 | it + byteSize(t) | <l, t> <- typedVarDecls(m));
+
 // All transitive #includes, as parsed by CDT and
 // their corresponding filepath, if applicable
 rel[loc, loc] includes(M3 m) = { <i, l> | i <- domain(m.includeDirectives), l <- m.includeResolution[i] };
@@ -74,3 +77,69 @@ bool isLocal(M3 m, loc l) {
 
 	return false;
 }
+
+// TODO: Sizes
+int byteSize(\unspecified()) = 0;
+int byteSize(\void()) = 0;
+int byteSize(\char()) = 0;
+int byteSize(\wchar()) = 0;
+int byteSize(\int()) = 0;
+int byteSize(\float()) = 0;
+int byteSize(\double()) = 0;
+int byteSize(\boolean()) = 0;
+int byteSize(\char16()) = 0;
+int byteSize(\char32()) = 0;
+int byteSize(\nullPtr()) = 0;
+int byteSize(\int128()) = 0;
+int byteSize(\float128()) = 0;
+int byteSize(\decimal32()) = 0;
+int byteSize(\decimal64()) = 0;
+int byteSize(\decimal128()) = 0;
+
+int byteSize(\array(TypeSymbol baseType)) = 0;
+int byteSize(\array(TypeSymbol baseType, int size)) = 0;
+int byteSize(\basicType(list[TypeModifier] modifiers, TypeSymbol baseType)) = 0;
+int byteSize(\class(loc decl)) = 0;
+int byteSize(\union(loc decl)) = 0;
+int byteSize(\struct(list[TypeSymbol] fields)) = 0;
+int byteSize(\qualifierType(list[TypeModifier] modifiers, TypeSymbol \type)) = 0;
+int byteSize(\pointerType(list[TypeModifier] modifiers, TypeSymbol \type)) = 0;
+int byteSize(\functionType(TypeSymbol returnType, list[TypeSymbol] parameterTypes)) = 0;
+int byteSize(\functionTypeVarArgs(TypeSymbol returnType, list[TypeSymbol] parameterTypes)) = 0;
+int byteSize(\typeContainer(TypeSymbol \type)) = 0;
+int byteSize(\typedef(TypeSymbol \type)) = 0;
+int byteSize(\enumeration(loc decl)) = 0;
+int byteSize(\referenceType(TypeSymbol \type)) = 0;
+int byteSize(\parameterPackType(TypeSymbol \type)) = 0;
+
+int byteSize(\classSpecialization(loc decl, list[TypeSymbol] templateArguments)) = 0;
+int byteSize(\enumerationSpecialization(loc specializedBinding, list[TypeSymbol] templateArguments)) = 0;
+
+int byteSize(\templateTypeParameter(loc owner, loc decl)) = 0;
+int byteSize(\implicitTemplateTypeParameter(loc owner, int position)) = 0; //no decl?
+int byteSize(\deferredClassInstance(str name)) = 0;
+int byteSize(\unknownMemberClass(loc owner, str name)) = 0;
+
+int byteSize(\typeOfDependentExpression(loc src)) = 0;
+int byteSize(\problemBinding()) = 0;
+int byteSize(\problemType(str msg)) = 0;
+int byteSize(\noType()) = 0;
+
+int byteSize(\cStructTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\cUnionTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\cClassTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\eStructTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\eUnionTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\eClassTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\eEnumTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\templateTemplate(TypeSymbol child, list[loc] templateParameters)) = 0;
+int byteSize(\functionTemplate(loc decl, list[loc] templateParameters)) = 0;
+int byteSize(\variableTemplate(loc decl, list[loc] templateParameters)) = 0;
+
+int byteSize(\aliasTemplate(loc decl, list[loc] templateParameters)) = 0;
+
+int byteSize(\functionSetType(loc decl, list[TypeSymbol] templateArguments)) = 0;
+int byteSize(\functionSetTypePointer(loc decl, list[TypeSymbol] templateArguments)) = 0;
+
+int byteSize(\unresolved()) = 0;
+int byteSize(\any()) = 0;
