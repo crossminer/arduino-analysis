@@ -28,7 +28,7 @@ $ mvn clean package
 $ java -jar RascalArduino/target/arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /path/to/a/Sketch/file.cpp
 ```
 
-  - Example output
+  - By default, the project will compute the values of all functions tagged with the `@metric` annotation in [Metrics.rsc](https://github.com/tdegueul/arduino-analysis/blob/master/RascalArduino/src/arduino/Metrics.rsc) the Example output
 
 ```
 $ java -jar RascalArduino/target/arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar target/arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/dig/repositories/RadioHead/examples/rf95/rf95_reliable_datagram_server/rf95_reliable_datagram_server.pde
