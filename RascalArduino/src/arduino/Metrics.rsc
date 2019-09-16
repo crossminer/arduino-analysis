@@ -12,6 +12,7 @@ import Relation;
 
 // Build an M3 model for the given C++ file
 // e.g. |file:///path/to/File.cpp| or |project://Project/File.cpp|
+@memo
 M3 cppM3(loc l) {
 	// Customize those according to your OS/setup
 	list[loc] localCP = [
@@ -51,20 +52,35 @@ rel[loc, TypeSymbol] typedVarDecls(M3 m) = { <l, t> | l <- varDecls(m), t <- m.d
 rel[loc, TypeSymbol] typedFunctions(M3 m)  = { <l, t> | l <- functions(m),  t <- m.declaredType[l] };
 rel[loc, TypeSymbol] allTypedVarDecls(M3 m) = { <l, t> | l <- allVarDecls(m), t <- m.declaredType[l] };
 
-// Basic memory usage calculation; to be done
+// Basic memory usage calculation
+@metric
 int sketchSize(M3 m) = (0 | it + byteSize(t) | <l, t> <- typedVarDecls(m));
+
+@metric
 int allSketchSize(M3 m) = (0 | it + byteSize(t) | <l, t> <- allTypedVarDecls(m));
 
 // List of all the includes of the include graph. Includes are mapped to
 // the physical locations of the corresponding C++ files, when resolved.
+@metric
 rel[loc, loc] includes(M3 m) = { <i, l> | i <- domain(m.includeDirectives), l <- m.includeResolution[i] };
 
 // Ratio of comments/documentation.
 // Ratio is character-wise, not line-wise
+@metric
 real commentRatio(M3 m) {
 	int fileSize = size(readFile(m.id));
 	int commentsSize = (0 | it + size(readFile(l)) | l <- m.comments, l.uri == m.id.uri);
 	return commentsSize / toReal(fileSize);
+}
+
+// Missing dependencies
+@metric
+set[loc] missingDeps(M3 m) {
+	return { logical | <logical, physical> <- includes(m), physical == |unresolved:///| };
+}
+
+real similarity(M3 m1, M3 m2) {
+	return jaccard(m1.declarations, m2.declarations);
 }
 
 // Helpers
@@ -73,8 +89,6 @@ bool isMethod(loc l)   = l.scheme == "cpp+method";
 bool isFunction(loc l) = l.scheme == "cpp+function";
 
 bool isLocal(M3 m, loc l) {
-	set[loc] physicalLocs = m.declarations[l];
-
 	for (loc physical <- m.declarations[l])
 		if (physical.uri == m.id.uri)
 			return true;
