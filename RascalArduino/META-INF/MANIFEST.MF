@@ -1,7 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: RascalArduino
-Bundle-SymbolicName: RascalArduino
-Bundle-Version: 1.0.0
-Require-Bundle: rascal_eclipse
+Bundle-Name: Arduino Analysis in Rascal
+Bundle-SymbolicName: arduino-analysis
+Bundle-Version: 0.1.0.qualifier
+Require-Bundle: rascal_eclipse,
+ org.eclipse.cdt.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: arduino

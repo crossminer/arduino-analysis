@@ -21,7 +21,7 @@ import io.usethesource.vallang.IValue;
 import io.usethesource.vallang.IValueFactory;
 
 public class RunArduinoMetrics {
-	private final String clairPath = "/home/dig/repositories/clair/src/";
+	private final String clairPath = Paths.get("clair/src/").toAbsolutePath().toString();
 	private final IValueFactory vf = ValueFactoryFactory.getValueFactory();
 	private final Evaluator eval;
 
