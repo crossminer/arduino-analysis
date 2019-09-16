@@ -22,13 +22,13 @@ $ mvn clean package
 [output JAR stored in RascalArduino/target/arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar]
 ```
 
-  - Run
+  - Run the project. *Keep in mind that for the JAR to run properly, it needs to be placed next to the `src/` and `clair/` directories to find the Rascal modules at run time*
 
 ```
 $ java -jar RascalArduino/target/arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /path/to/a/Sketch/file.cpp
 ```
 
-  - By default, the project will compute the values of all functions tagged with the `@metric` annotation in [Metrics.rsc](https://github.com/tdegueul/arduino-analysis/blob/master/RascalArduino/src/arduino/Metrics.rsc) the Example output
+  - By default, the project will compute the values of all functions tagged with the `@metric` annotation in [Metrics.rsc](https://github.com/tdegueul/arduino-analysis/blob/master/RascalArduino/src/arduino/Metrics.rsc):
 
 ```
 $ java -jar RascalArduino/target/arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar target/arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/dig/repositories/RadioHead/examples/rf95/rf95_reliable_datagram_server/rf95_reliable_datagram_server.pde
