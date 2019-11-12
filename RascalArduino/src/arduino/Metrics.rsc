@@ -10,12 +10,24 @@ import String;
 import util::Math;
 import Relation;
 
+// Those ones are Arduino-specific. Sources:
+//   - https://github.com/arduino/ArduinoCore-avr
+//   - https://github.com/PaulStoffregen/RadioHead
+//   - https://github.com/PaulStoffregen/SPI/
+list[loc] arduinoIncludes = [
+	|file:///usr/avr/include/|,
+	|file:///home/dig/repositories/SPI|,
+	|file:///home/dig/repositories/RadioHead|,
+	|file:///home/dig/repositories/ArduinoCore-avr/cores/arduino|,
+	|file:///home/dig/repositories/ArduinoCore-avr/variants/standard/|
+];
+
 // Build an M3 model for the given C++ file
 // e.g. |file:///path/to/File.cpp| or |project://Project/File.cpp|
 @memo
-M3 cppM3(loc l) {
+M3 cppM3(loc l, list[loc] includes = []) {
 	// Customize those according to your OS/setup
-	list[loc] localCP = [
+	list[loc] stdIncludes = [
 		|file:///usr/include|,
     	|file:///usr/include/c++/8.2.1|,
     	|file:///usr/include/c++/8.2.1/tr1|,
@@ -23,19 +35,18 @@ M3 cppM3(loc l) {
     	|file:///usr/include/c++/8.2.1/x86_64-pc-linux-gnu/|
     ];
 
-    // Those ones are Arduino-specific. Sources:
-    //   - https://github.com/arduino/ArduinoCore-avr
-    //   - https://github.com/PaulStoffregen/RadioHead
-    //   - https://github.com/PaulStoffregen/SPI/
-    list[loc] arduinoCP = [
-    	|file:///usr/avr/include/|,
-    	|file:///home/dig/repositories/SPI|,
-    	|file:///home/dig/repositories/RadioHead|,
-    	|file:///home/dig/repositories/ArduinoCore-avr/cores/arduino|,
-    	|file:///home/dig/repositories/ArduinoCore-avr/variants/standard/|
-    ];
+	M3 m = createM3FromCppFile(l, stdLib = stdIncludes, includeDirs = includes);
 
-	return createM3FromCppFile(l, stdLib = localCP, includeDirs = arduinoCP);
+	// includeResolution often contains two entries for a given include:
+	// a resolved one and an unresolved one; remove the latter
+	// TODO: issue on CLAIR
+	m.includeResolution -= { <log, phy> | <log, phy> <- m.includeResolution,
+		isUnresolved(phy) && size(m.includeResolution[log]) > 1 };
+
+	for (loc l <- missingDeps(m))
+		println("Warning: <l> could not be resolved");
+
+	return m;
 }
 
 // Transitive list of all variable declarations and functions/methods
@@ -75,10 +86,9 @@ real commentRatio(M3 m) {
 
 // Missing dependencies
 @metric
-set[loc] missingDeps(M3 m) {
-	return { logical | <logical, physical> <- includes(m), physical == |unresolved:///| };
-}
+set[loc] missingDeps(M3 m) = invert(includes(m))[|unresolved:///|];
 
+// Similarity / clones detection
 real similarity(M3 m1, M3 m2) {
 	return jaccard(m1.declarations, m2.declarations);
 }
@@ -87,6 +97,8 @@ real similarity(M3 m1, M3 m2) {
 bool isVariable(loc l) = l.scheme == "cpp+variable";
 bool isMethod(loc l)   = l.scheme == "cpp+method";
 bool isFunction(loc l) = l.scheme == "cpp+function";
+
+bool isUnresolved(loc l) = l == |unresolved:///|;
 
 bool isLocal(M3 m, loc l) {
 	for (loc physical <- m.declarations[l])
