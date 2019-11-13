@@ -14,7 +14,7 @@ import Relation;
 //   - https://github.com/arduino/ArduinoCore-avr
 //   - https://github.com/PaulStoffregen/RadioHead
 //   - https://github.com/PaulStoffregen/SPI/
-list[loc] arduinoIncludes = [
+public list[loc] arduinoIncludes = [
 	|file:///usr/avr/include/|,
 	|file:///home/dig/repositories/SPI|,
 	|file:///home/dig/repositories/RadioHead|,
@@ -24,15 +24,14 @@ list[loc] arduinoIncludes = [
 
 // Build an M3 model for the given C++ file
 // e.g. |file:///path/to/File.cpp| or |project://Project/File.cpp|
-@memo
 M3 cppM3(loc l, list[loc] includes = []) {
 	// Customize those according to your OS/setup
 	list[loc] stdIncludes = [
 		|file:///usr/include|,
-    	|file:///usr/include/c++/8.2.1|,
-    	|file:///usr/include/c++/8.2.1/tr1|,
+    	|file:///usr/include/c++/9.2.0|,
+    	|file:///usr/include/c++/9.2.0/tr1|,
     	|file:///usr/include/linux/|,
-    	|file:///usr/include/c++/8.2.1/x86_64-pc-linux-gnu/|
+    	|file:///usr/include/c++/9.2.0/x86_64-pc-linux-gnu/|
     ];
 
 	M3 m = createM3FromCppFile(l, stdLib = stdIncludes, includeDirs = includes);
@@ -89,14 +88,44 @@ real commentRatio(M3 m) {
 set[loc] missingDeps(M3 m) = invert(includes(m))[|unresolved:///|];
 
 // Similarity / clones detection
-real similarity(M3 m1, M3 m2) {
-	return jaccard(m1.declarations, m2.declarations);
+real similarity(M3 orig, M3 fork) {
+	// We're only interested in the current module's declarations
+	set[loc] localOrigDecls = localDecls(orig);
+	set[loc] localForkDecls = localDecls(fork);
+
+	// Stripped method signatures
+	set[str] origMethods = { replaceAll(l.uri, l.parent.uri, "") | l <- localOrigDecls, isMethod(l) };
+	set[str] forkMethods = { replaceAll(l.uri, l.parent.uri, "") | l <- localForkDecls, isMethod(l) };
+
+	// Stripped function signatures
+	set[str] origFunctions = { l | l <- localOrigDecls, isFunction(l) };
+	set[str] forkFunctions = { l | l <- localForkDecls, isFunction(l) };
+
+	// Stripped field signatures
+	set[str] origFields = { replaceAll(l.uri, l.parent.uri, "") | l <- localOrigDecls, isField(l) };
+	set[str] forkFields = { replaceAll(l.uri, l.parent.uri, "") | l <- localForkDecls, isField(l) };
+
+	set[str] origDecls = origMethods + origFunctions + origFields;
+	set[str] forkDecls = forkMethods + forkFunctions + forkFields;
+	
+	assert size(origDecls) > 0 : "No declarations found in orig.";
+	assert size(forkDecls) > 0 : "No declarations found in fork.";
+
+	set[str] inter = origDecls & forkDecls;
+
+	println("Comparing <orig.id.file> \<-\> <fork.id.file>");
+	println("\tPerfect matches: <size(inter)> declarations (<toReal(size(inter)) / size(origDecls) * 100>%) have been perfectly matched in the fork.");
+	
+	// TODO: match e.g. uint16_t / uint32_t
+	
+	return jaccard(origDecls, forkDecls);
 }
 
 // Helpers
 bool isVariable(loc l) = l.scheme == "cpp+variable";
 bool isMethod(loc l)   = l.scheme == "cpp+method";
 bool isFunction(loc l) = l.scheme == "cpp+function";
+bool isField(loc l) = l.scheme == "cpp+field";
 
 bool isUnresolved(loc l) = l == |unresolved:///|;
 
@@ -106,6 +135,10 @@ bool isLocal(M3 m, loc l) {
 			return true;
 
 	return false;
+}
+
+set[loc] localDecls(M3 m) {
+	return { l | <l, p> <- m.declarations, p.uri == m.id.uri };
 }
 
 // TODO: Sizes
