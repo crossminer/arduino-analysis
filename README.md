@@ -40,12 +40,12 @@ Comparing WiFiManager.cpp <-> WiFiManager.cpp
         Perfect matches: 32 declarations (76.1904761900%) have been perfectly matched in the fork.
 Score: 0.6530612
 
-$ java -jar arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/dig/sandbox/SX1272/orig/libraries/SX1272/WaspSX1272.cpp /home/dig/sandbox/SX1272/fork/Arduino/libraries/SX1272/src/SX1272.cpp                                 ST 1   master 
+$ java -jar arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/dig/sandbox/SX1272/orig/libraries/SX1272/WaspSX1272.cpp /home/dig/sandbox/SX1272/fork/Arduino/libraries/SX1272/src/SX1272.cpp
 Comparing WaspSX1272.cpp <-> SX1272.cpp
         Perfect matches: 66 declarations (67.3469387800%) have been perfectly matched in the fork.
 Score: 0.528
 
-$ java -jar arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/dig/sandbox/IRremote/orig/IRremoteInt.h /home/dig/sandbox/IRremote/fork/IRremoteInt.h                                                                         ST 1   master 
+$ java -jar arduino-analysis-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/dig/sandbox/IRremote/orig/IRremoteInt.h /home/dig/sandbox/IRremote/fork/IRremoteInt.h
 Comparing IRremoteInt.h <-> IRremoteInt.h
         Perfect matches: 8 declarations (100.%) have been perfectly matched in the fork.
 Score: 1.0
