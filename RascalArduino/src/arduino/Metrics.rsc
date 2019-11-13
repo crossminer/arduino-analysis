@@ -24,7 +24,7 @@ public list[loc] arduinoIncludes = [
 
 // Build an M3 model for the given C++ file
 // e.g. |file:///path/to/File.cpp| or |project://Project/File.cpp|
-M3 cppM3(loc l, list[loc] includes = []) {
+M3 cppM3(loc l, list[loc] includes = arduinoIncludes) {
 	// Customize those according to your OS/setup
 	list[loc] stdIncludes = [
 		|file:///usr/include|,
@@ -98,8 +98,8 @@ real similarity(M3 orig, M3 fork) {
 	set[str] forkMethods = { replaceAll(l.uri, l.parent.uri, "") | l <- localForkDecls, isMethod(l) };
 
 	// Stripped function signatures
-	set[str] origFunctions = { l | l <- localOrigDecls, isFunction(l) };
-	set[str] forkFunctions = { l | l <- localForkDecls, isFunction(l) };
+	set[str] origFunctions = { l.uri | l <- localOrigDecls, isFunction(l) };
+	set[str] forkFunctions = { l.uri | l <- localForkDecls, isFunction(l) };
 
 	// Stripped field signatures
 	set[str] origFields = { replaceAll(l.uri, l.parent.uri, "") | l <- localOrigDecls, isField(l) };
