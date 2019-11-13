@@ -85,8 +85,9 @@ rel[loc, loc] makeEntry(Declaration declaration, loc current) {
     return {<declaration.declarator.decl, current>};
   } else {
     if (!(declaration is staticAssert)) {
-      println("Missed entry for member visibility?");
-      iprintln(declaration);
+      //println("Missed entry for member visibility?");
+      //iprintln(declaration);
+      ;
     }
     return {};
   }
